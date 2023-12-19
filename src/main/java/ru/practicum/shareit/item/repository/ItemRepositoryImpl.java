@@ -6,6 +6,7 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Repository
@@ -36,7 +37,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     public Collection<Item> getItemsByOwner(Long ownerId) {
         return items.values()
                 .stream()
-                .filter(item -> item.getOwner().getId() == ownerId)
+                .filter(item -> Objects.equals(item.getOwner().getId(), ownerId))
                 .collect(Collectors.toList());
     }
 
