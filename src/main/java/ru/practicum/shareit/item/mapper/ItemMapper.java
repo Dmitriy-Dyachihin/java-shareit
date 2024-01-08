@@ -19,7 +19,7 @@ public class ItemMapper {
                 .build();
     }
 
-    public ItemDto toItemDto(Item item) {
+    public static ItemDto toItemDto(Item item) {
         return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())
