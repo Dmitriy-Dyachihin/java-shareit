@@ -67,7 +67,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto update(Long id, ItemDto itemDto, Long ownerId) {
         Item updatedItem = itemRepository.findById(id).orElseThrow(() -> new NotFoundException("Предмет с указанным id не существует"));
-        if (updatedItem.getOwner().getId() != ownerId) {
+        if (!updatedItem.getOwner().getId().equals(ownerId)) {
             throw new NotFoundException("Пользователь не является владельцем указанного товара");
         }
         if (itemMapper.toItem(itemDto).getName() != null) {
@@ -91,7 +91,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Предмет с указанным id не существует"));
         ItemDto itemDto = itemMapper.toItemDto(item);
-        if (item.getOwner().getId() == userId) {
+        if (item.getOwner().getId().equals(userId)) {
             Booking lastBooking = bookingRepository.findFirstByItemAndStatusNotAndStartLessThan(item,
                     Status.REJECTED, LocalDateTime.now(), Sort.by(Sort.Direction.DESC, "start"));
             if (lastBooking != null) {
@@ -215,18 +215,18 @@ public class ItemServiceImpl implements ItemService {
 
     private void setBookings(ItemDto itemDto, List<BookingShortDto> bookings) {
         itemDto.setLastBooking(bookings.stream()
-                .filter(bookingShortDto -> bookingShortDto.getItemId() == itemDto.getId() &&
+                .filter(bookingShortDto -> bookingShortDto.getItemId().equals(itemDto.getId()) &&
                         bookingShortDto.getEnd().isBefore(LocalDateTime.now()))
                 .reduce((a,b) -> a).orElse(null));
         itemDto.setNextBooking(bookings.stream()
-                .filter(bookingShortDto -> bookingShortDto.getItemId() == itemDto.getId() &&
+                .filter(bookingShortDto -> bookingShortDto.getItemId().equals(itemDto.getId()) &&
                         bookingShortDto.getStart().isAfter(LocalDateTime.now()))
                 .findFirst().orElse(null));
     }
 
     private void setComments(ItemDto itemDto, List<Comment> comments) {
         itemDto.setComments(comments.stream()
-                .filter(comment -> comment.getItem().getId() == itemDto.getId())
+                .filter(comment -> comment.getItem().getId().equals(itemDto.getId()))
                 .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList())
         );
