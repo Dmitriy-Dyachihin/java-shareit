@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.practicum.shareit.booking.mapper.BookingMapper.toBookingDto;
 
 @Service
 @AllArgsConstructor
@@ -54,7 +55,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setItem(item);
         booking.setStatus(Status.WAITING);
         Booking bookingToSave = bookingRepository.save(booking);
-        return bookingMapper.toBookingDto(bookingToSave);
+        return toBookingDto(bookingToSave);
     }
 
     @Transactional
@@ -74,7 +75,7 @@ public class BookingServiceImpl implements BookingService {
         } else {
             booking.setStatus(Status.REJECTED);
         }
-        return bookingMapper.toBookingDto(booking);
+        return toBookingDto(booking);
     }
 
     @Transactional(readOnly = true)
@@ -86,7 +87,7 @@ public class BookingServiceImpl implements BookingService {
         if (!booking.getBooker().getId().equals(userId) && !booking.getItem().getOwner().getId().equals(userId)) {
             throw new NotFoundException("Пользователь не является ни владельцем товара, ни его арендатором");
         }
-        return bookingMapper.toBookingDto(booking);
+        return toBookingDto(booking);
     }
 
     @Transactional(readOnly = true)
@@ -100,7 +101,8 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findAllByBooker(user, sort);
                 break;
             case "CURRENT":
-                bookings = bookingRepository.findAllByBookerAndStartBeforeAndEndAfter(user, LocalDateTime.now(), LocalDateTime.now(), sort);
+                bookings = bookingRepository.findAllByBookerAndStartBeforeAndEndAfter(user, LocalDateTime.now(),
+                        LocalDateTime.now(), sort);
                 break;
             case "PAST":
                 bookings = bookingRepository.findAllByBookerAndEndBefore(user, LocalDateTime.now(), sort);
@@ -131,7 +133,8 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findAllByItemOwner(owner, sort);
                 break;
             case "CURRENT":
-                bookings = bookingRepository.findAllByItemOwnerAndStartBeforeAndEndAfter(owner, LocalDateTime.now(), LocalDateTime.now(), sort);
+                bookings = bookingRepository.findAllByItemOwnerAndStartBeforeAndEndAfter(owner, LocalDateTime.now(),
+                        LocalDateTime.now(), sort);
                 break;
             case "PAST":
                 bookings = bookingRepository.findAllByItemOwnerAndEndBefore(owner, LocalDateTime.now(), sort);
