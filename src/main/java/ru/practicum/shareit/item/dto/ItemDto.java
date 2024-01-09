@@ -4,11 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
@@ -30,5 +31,7 @@ public class ItemDto {
     @NotNull
     private Boolean available;
     private User owner;
-    private ItemRequest itemRequest;
+    private BookingShortDto nextBooking;
+    private BookingShortDto lastBooking;
+    private List<CommentDto> comments;
 }
