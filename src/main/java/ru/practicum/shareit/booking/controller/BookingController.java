@@ -25,34 +25,33 @@ import java.util.Collection;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final String userIdHeader = "X-Sharer-User-Id";
 
     @PostMapping
-    public BookingDto create(@RequestBody BookingInputDto bookingInputDto,
-                             @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public BookingDto create(@RequestBody BookingInputDto bookingInputDto, @RequestHeader(userIdHeader) Long userId) {
         return bookingService.create(userId, bookingInputDto);
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingDto approve(@RequestHeader("X-Sharer-User-Id") Long userId,
-                              @PathVariable(name = "bookingId") Long bookingId, @RequestParam Boolean approved) {
+    public BookingDto approve(@RequestHeader(userIdHeader) Long userId, @PathVariable(name = "bookingId") Long bookingId,
+                              @RequestParam Boolean approved) {
         return bookingService.approve(userId, bookingId, approved);
     }
 
     @GetMapping("/{bookingId}")
-    public BookingDto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
-                              @PathVariable Long bookingId) {
+    public BookingDto getById(@RequestHeader(userIdHeader) Long userId, @PathVariable Long bookingId) {
         return bookingService.getById(userId, bookingId);
     }
 
     @GetMapping
     public Collection<BookingDto> getByUser(@RequestParam(defaultValue = "ALL") String state,
-                                             @RequestHeader("X-Sharer-User-Id") Long userId) {
+                                            @RequestHeader(userIdHeader) Long userId) {
         return bookingService.getByUser(state, userId);
     }
 
     @GetMapping("/owner")
     public Collection<BookingDto> getByOwner(@RequestParam(defaultValue = "ALL") String state,
-                                             @RequestHeader("X-Sharer-User-Id") Long userId) {
+                                             @RequestHeader(userIdHeader) Long userId) {
         return bookingService.getByOwner(state, userId);
     }
 }

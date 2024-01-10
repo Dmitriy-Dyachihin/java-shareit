@@ -31,9 +31,11 @@ public class Booking {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "item_id")
+    @ToString.Exclude
     private Item item;
     @ManyToOne
     @JoinColumn(name = "booker_id")
+    @ToString.Exclude
     private User booker;
     @Column(name = "start_booking")
     private LocalDateTime start;

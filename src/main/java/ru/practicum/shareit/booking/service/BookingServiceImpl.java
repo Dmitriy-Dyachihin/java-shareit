@@ -29,11 +29,11 @@ import static ru.practicum.shareit.booking.mapper.BookingMapper.toBookingDto;
 @AllArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
-    BookingMapper bookingMapper;
-    UserService userService;
-    UserMapper userMapper;
-    ItemRepository itemRepository;
-    BookingRepository bookingRepository;
+    private final BookingMapper bookingMapper;
+    private final UserService userService;
+    private final UserMapper userMapper;
+    private final ItemRepository itemRepository;
+    private final BookingRepository bookingRepository;
 
     @Transactional
     @Override
