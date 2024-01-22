@@ -2,20 +2,22 @@ package ru.practicum.shareit.item.mapper;
 
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.item.dto.InputItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+
+import java.util.ArrayList;
 
 @NoArgsConstructor
 @Component
 public class ItemMapper {
 
-    public Item toItem(ItemDto itemDto) {
+    public Item toItem(InputItemDto inputItemDto) {
         return Item.builder()
-                .id(itemDto.getId())
-                .name(itemDto.getName())
-                .description(itemDto.getDescription())
-                .available(itemDto.getAvailable())
-                .owner(itemDto.getOwner())
+                .id(inputItemDto.getId())
+                .name(inputItemDto.getName())
+                .description(inputItemDto.getDescription())
+                .available(inputItemDto.getAvailable())
                 .build();
     }
 
@@ -25,7 +27,9 @@ public class ItemMapper {
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-                .owner(item.getOwner())
+                .comments(new ArrayList<>())
+                .requestId((item.getItemRequest() == null ? null : item.getItemRequest().getId()))
                 .build();
+
     }
 }

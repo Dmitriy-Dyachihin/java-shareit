@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +13,7 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.InputItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -18,6 +21,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -42,10 +47,11 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Transactional
     @Override
-    public ItemDto create(ItemDto itemDto, Long ownerId) {
+    public ItemDto create(InputItemDto itemDto, Long ownerId) {
         Item newItem = itemMapper.toItem(itemDto);
         if (newItem.getName() == null || newItem.getName().isBlank()) {
             throw new BadRequestException("Имя не может быть пустым");
@@ -59,6 +65,11 @@ public class ItemServiceImpl implements ItemService {
         User owner = userRepository.findById(ownerId).orElseThrow(() ->
                 new NotFoundException("Пользователь с указанным id не существует"));
         newItem.setOwner(owner);
+        if (itemDto.getRequestId() != null) {
+            ItemRequest itemRequest = itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow(() ->
+                    new NotFoundException("Не существует запроса с указанным id"));
+            newItem.setItemRequest(itemRequest);
+        }
         Item item = itemRepository.save(newItem);
         log.info("Добавлена новая вещь с id={}", item.getId());
         return toItemDto(item);
@@ -66,7 +77,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     @Override
-    public ItemDto update(Long id, ItemDto itemDto, Long ownerId) {
+    public ItemDto update(Long id, InputItemDto itemDto, Long ownerId) {
         Item updatedItem = itemRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Предмет с указанным id не существует"));
         if (!updatedItem.getOwner().getId().equals(ownerId)) {
@@ -119,10 +130,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public Collection<ItemDto> getItemsByOwner(Long ownerId) {
+    public Collection<ItemDto> getItemsByOwner(Long ownerId, Integer from, Integer size) {
         User user = userRepository.findById(ownerId).orElseThrow(() ->
                 new NotFoundException("Пользователь с указанным id не существует"));
-        List<Item> items = itemRepository.findAllByOwnerOrderByIdAsc(user);
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.ASC, "id"));
+        List<Item> items = itemRepository.findAllByOwnerOrderById(user, pageable);
         List<ItemDto> itemDtos = items.stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
         List<Comment> comments = commentRepository.findAllByItemIdIn(items.stream()
                 .map(Item::getId)
@@ -150,13 +162,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public Collection<ItemDto> findItem(String text) {
+    public Collection<ItemDto> findItem(String text, Integer from, Integer size) {
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.ASC, "id"));
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
         log.info("Получен результат поиска подстроки {}", text);
         return itemRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAndAvailable(text, text,
-                        true)
+                        true, pageable)
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
