@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.mapper;
 
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.InputItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -8,7 +7,6 @@ import ru.practicum.shareit.item.model.Item;
 
 import java.util.ArrayList;
 
-@NoArgsConstructor
 @Component
 public class ItemMapper {
 
@@ -21,7 +19,7 @@ public class ItemMapper {
                 .build();
     }
 
-    public static ItemDto toItemDto(Item item) {
+    public ItemDto toItemDto(Item item) {
         return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())

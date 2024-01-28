@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ru.practicum.shareit.request.mapper.ItemRequestMapper.toItemRequestDto;
 
 @AllArgsConstructor
 @Service
@@ -47,7 +46,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         itemRequest.setRequester(requester);
         itemRequest.setCreated(LocalDateTime.now());
         log.info("Добавлен новый запрос вещи с id={}", itemRequest.getId());
-        return toItemRequestDto(itemRequestRepository.save(itemRequest));
+        return itemRequestMapper.toItemRequestDto(itemRequestRepository.save(itemRequest));
     }
 
     @Transactional(readOnly = true)
@@ -91,7 +90,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             for (Item item : items) {
                 itemDto.add(itemMapper.toItemDto(item));
             }
-            ItemRequestDto requestDto = ItemRequestMapper.toItemRequestDto(request);
+            ItemRequestDto requestDto = itemRequestMapper.toItemRequestDto(request);
             requestDto.setItems(itemDto);
             reqestDtos.add(requestDto);
         }

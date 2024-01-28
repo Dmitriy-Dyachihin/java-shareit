@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 import static ru.practicum.shareit.booking.mapper.BookingMapper.toBookingShortDto;
 import static ru.practicum.shareit.item.mapper.CommentMapper.toComment;
 import static ru.practicum.shareit.item.mapper.CommentMapper.toCommentDto;
-import static ru.practicum.shareit.item.mapper.ItemMapper.toItemDto;
 
 @Service
 @RequiredArgsConstructor
@@ -72,7 +71,7 @@ public class ItemServiceImpl implements ItemService {
         }
         Item item = itemRepository.save(newItem);
         log.info("Добавлена новая вещь с id={}", item.getId());
-        return toItemDto(item);
+        return itemMapper.toItemDto(item);
     }
 
     @Transactional
@@ -93,7 +92,7 @@ public class ItemServiceImpl implements ItemService {
             updatedItem.setAvailable(itemDto.getAvailable());
         }
         log.info("Обновлена вещь с id={}", updatedItem.getId());
-        return toItemDto(itemRepository.save(updatedItem));
+        return itemMapper.toItemDto(itemRepository.save(updatedItem));
     }
 
     @Transactional(readOnly = true)
@@ -103,7 +102,7 @@ public class ItemServiceImpl implements ItemService {
                 new NotFoundException("Пользователь с указанным id не существует"));
         Item item = itemRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Предмет с указанным id не существует"));
-        ItemDto itemDto = toItemDto(item);
+        ItemDto itemDto = itemMapper.toItemDto(item);
         if (item.getOwner().getId().equals(userId)) {
             Booking lastBooking = bookingRepository.findFirstByItemAndStatusEqualsAndStartLessThan(item,
                     Status.APPROVED, LocalDateTime.now(), Sort.by(Sort.Direction.DESC, "start"));
@@ -135,7 +134,7 @@ public class ItemServiceImpl implements ItemService {
                 new NotFoundException("Пользователь с указанным id не существует"));
         Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.ASC, "id"));
         List<Item> items = itemRepository.findAllByOwnerOrderById(user, pageable);
-        List<ItemDto> itemDtos = items.stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+        List<ItemDto> itemDtos = items.stream().map(itemMapper::toItemDto).collect(Collectors.toList());
         List<Comment> comments = commentRepository.findAllByItemIdIn(items.stream()
                 .map(Item::getId)
                 .collect(Collectors.toList()), Sort.by(Sort.Direction.DESC, "created"));
@@ -171,7 +170,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAndAvailable(text, text,
                         true, pageable)
                 .stream()
-                .map(ItemMapper::toItemDto)
+                .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
