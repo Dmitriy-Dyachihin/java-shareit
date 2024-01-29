@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInputDto;
 import ru.practicum.shareit.booking.service.BookingService;
 
+import javax.validation.constraints.Min;
 import java.util.Collection;
 
 /**
@@ -22,6 +24,7 @@ import java.util.Collection;
 @RestController
 @RequestMapping(path = "/bookings")
 @AllArgsConstructor
+@Validated
 public class BookingController {
 
     private final BookingService bookingService;
@@ -45,13 +48,17 @@ public class BookingController {
 
     @GetMapping
     public Collection<BookingDto> getByUser(@RequestParam(defaultValue = "ALL") String state,
-                                            @RequestHeader(userIdHeader) Long userId) {
-        return bookingService.getByUser(state, userId);
+                                            @RequestHeader(userIdHeader) Long userId,
+                                            @Min(0) @RequestParam(defaultValue = "0") Integer from,
+                                            @Min(1) @RequestParam(defaultValue = "10") Integer size) {
+        return bookingService.getByUser(state, userId, from, size);
     }
 
     @GetMapping("/owner")
     public Collection<BookingDto> getByOwner(@RequestParam(defaultValue = "ALL") String state,
-                                             @RequestHeader(userIdHeader) Long userId) {
-        return bookingService.getByOwner(state, userId);
+                                             @RequestHeader(userIdHeader) Long userId,
+                                             @Min(0) @RequestParam(defaultValue = "0") Integer from,
+                                             @Min(1) @RequestParam(defaultValue = "10") Integer size) {
+        return bookingService.getByOwner(state, userId, from, size);
     }
 }
