@@ -20,9 +20,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.PositiveOrZero;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
@@ -32,29 +29,29 @@ public class ItemController {
 
     private final ItemClient itemClient;
 
-    private final String userIdHeader = "X-Sharer-User-Id";
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public ResponseEntity<Object> create(@Valid @RequestBody InputItemDto itemDto, @RequestHeader(userIdHeader) Long ownerId) {
+    public ResponseEntity<Object> create(@Valid @RequestBody InputItemDto itemDto, @RequestHeader(USER_ID_HEADER) Long ownerId) {
         log.debug("Создание вещи, id владельца = {}", ownerId);
         return itemClient.create(itemDto, ownerId);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<Object> update(@PathVariable Long id, @Valid @RequestBody InputItemDto itemDto,
-                                         @RequestHeader(userIdHeader) Long ownerId) {
+                                         @RequestHeader(USER_ID_HEADER) Long ownerId) {
         log.debug("Создание вещи c id={}, id владельца = {}", id, ownerId);
         return itemClient.update(id, itemDto, ownerId);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getById(@PathVariable Long id, @RequestHeader(userIdHeader) Long userId) {
+    public ResponseEntity<Object> getById(@PathVariable Long id, @RequestHeader(USER_ID_HEADER) Long userId) {
         log.debug("Получение вещи c id={} пользователем с id={}", id, userId);
         return itemClient.getById(id, userId);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getItemsByOwner(@RequestHeader(userIdHeader) Long ownerId,
+    public ResponseEntity<Object> getItemsByOwner(@RequestHeader(USER_ID_HEADER) Long ownerId,
                                                   @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                                   @Min(0) @RequestParam(defaultValue = "10") Integer size) {
         log.debug("Получение списка вещей владельца с id={}", ownerId);
@@ -65,13 +62,13 @@ public class ItemController {
     public ResponseEntity<Object> findItem(@RequestParam(name = "text") String text,
                                            @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                            @Min(0) @RequestParam(defaultValue = "10") Integer size,
-                                           @RequestHeader(userIdHeader) Long userId) {
+                                           @RequestHeader(USER_ID_HEADER) Long userId) {
         log.debug("Поиск вещей с запросом {}", text);
         return itemClient.findItem(userId, text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<Object> postComment(@RequestHeader(userIdHeader) Long authorId, @PathVariable Long itemId,
+    public ResponseEntity<Object> postComment(@RequestHeader(USER_ID_HEADER) Long authorId, @PathVariable Long itemId,
                                               @Valid @RequestBody CommentDto commentDto) {
         log.debug("Публткация комментария пользователем с id={} к вещи с id={}", authorId, itemId);
         return itemClient.postComment(authorId, itemId, commentDto);

@@ -17,34 +17,32 @@ import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.Collection;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
 
     private final ItemService itemService;
+    private final String userIdHeader = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemDto create(@RequestBody InputItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+    public ItemDto create(@RequestBody InputItemDto itemDto, @RequestHeader(userIdHeader) Long ownerId) {
         return itemService.create(itemDto, ownerId);
     }
 
     @PatchMapping("/{id}")
     public ItemDto update(@PathVariable Long id, @RequestBody InputItemDto itemDto,
-                          @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+                          @RequestHeader(userIdHeader) Long ownerId) {
         return itemService.update(id, itemDto, ownerId);
     }
 
     @GetMapping("/{id}")
-    public ItemDto getById(@PathVariable Long id, @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ItemDto getById(@PathVariable Long id, @RequestHeader(userIdHeader) Long userId) {
         return itemService.getById(id, userId);
     }
 
     @GetMapping
-    public Collection<ItemDto> getItemsByOwner(@RequestHeader("X-Sharer-User-Id") Long ownerId,
+    public Collection<ItemDto> getItemsByOwner(@RequestHeader(userIdHeader) Long ownerId,
                                                @RequestParam(defaultValue = "0") Integer from,
                                                @RequestParam(defaultValue = "10") Integer size) {
         return itemService.getItemsByOwner(ownerId, from, size);
@@ -58,7 +56,7 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto postComment(@RequestHeader("X-Sharer-User-Id") Long authorId, @PathVariable Long itemId,
+    public CommentDto postComment(@RequestHeader(userIdHeader) Long authorId, @PathVariable Long itemId,
                                   @RequestBody CommentDto commentDto) {
         return itemService.postComment(authorId, itemId, commentDto);
     }

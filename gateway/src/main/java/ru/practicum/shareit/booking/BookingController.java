@@ -20,9 +20,6 @@ import javax.validation.constraints.Min;
 
 import static ru.practicum.shareit.booking.State.getState;
 
-/**
- * TODO Sprint add-bookings.
- */
 @RestController
 @RequestMapping(path = "/bookings")
 @AllArgsConstructor
@@ -31,30 +28,30 @@ import static ru.practicum.shareit.booking.State.getState;
 public class BookingController {
 
     private final BookingClient bookingClient;
-    private final String userIdHeader = "X-Sharer-User-Id";
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public ResponseEntity<Object> create(@Valid @RequestBody BookingInputDto bookingInputDto, @RequestHeader(userIdHeader) Long userId) {
+    public ResponseEntity<Object> create(@Valid @RequestBody BookingInputDto bookingInputDto, @RequestHeader(USER_ID_HEADER) Long userId) {
         log.debug("Создание бронирования пользователем с id={}", userId);
         return bookingClient.bookItem(userId, bookingInputDto);
     }
 
     @PatchMapping("/{bookingId}")
-    public ResponseEntity<Object> approve(@RequestHeader(userIdHeader) Long userId, @PathVariable(name = "bookingId") Long bookingId,
+    public ResponseEntity<Object> approve(@RequestHeader(USER_ID_HEADER) Long userId, @PathVariable(name = "bookingId") Long bookingId,
                                           @RequestParam Boolean approved) {
         log.debug("Обновление статуса бронирования пользователем с id={}, id бронирования={}, статус {}}", userId, bookingId, approved);
         return bookingClient.approve(userId, bookingId, approved);
     }
 
     @GetMapping("/{bookingId}")
-    public ResponseEntity<Object> getById(@RequestHeader(userIdHeader) Long userId, @PathVariable Long bookingId) {
+    public ResponseEntity<Object> getById(@RequestHeader(USER_ID_HEADER) Long userId, @PathVariable Long bookingId) {
         log.debug("Получение бронирования пользователем с id={}, id бронирования={}}", userId, bookingId);
         return bookingClient.getBooking(userId, bookingId);
     }
 
     @GetMapping
     public ResponseEntity<Object> getByUser(@RequestParam(defaultValue = "ALL") String state,
-                                            @RequestHeader(userIdHeader) Long userId,
+                                            @RequestHeader(USER_ID_HEADER) Long userId,
                                             @Min(0) @RequestParam(defaultValue = "0") Integer from,
                                             @Min(1) @RequestParam(defaultValue = "10") Integer size) {
         log.debug("Получение списка бронирований пользователя с id={}", userId);
@@ -63,7 +60,7 @@ public class BookingController {
 
     @GetMapping("/owner")
     public ResponseEntity<Object> getByOwner(@RequestParam(defaultValue = "ALL") String state,
-                                             @RequestHeader(userIdHeader) Long userId,
+                                             @RequestHeader(USER_ID_HEADER) Long userId,
                                              @Min(0) @RequestParam(defaultValue = "0") Integer from,
                                              @Min(1) @RequestParam(defaultValue = "10") Integer size) {
         log.debug("Получение списка бронирований владельца вещей с id={}", userId);
