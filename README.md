@@ -61,3 +61,5 @@ docker-compose up
 * JPA
 * Mockito
 * Postman
+## Тестирование:
+Postman-тесты для приложения [ссылка](https://github.com/Dmitriy-Dyachihin/java-shareit/tree/main/postman)
